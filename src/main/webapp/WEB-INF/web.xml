@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:web="http://java.sun.com/xml/ns/javaee" xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd
+    http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>financeservice</display-name>
+
+	<!-- Spring 配置信息加载 (Spring 会创建一个“父容器") -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:spring-config.xml</param-value>
+	</context-param>
+	<listener>
+		<description>springListener</description>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- 日志信息加载 -->
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>classpath:log4j.properties</param-value>
+	</context-param>
+	<context-param>
+		<param-name>log4jRefreshInterval</param-name>
+		<param-value>6000</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+
+	<!-- 防止内存溢出 -->
+	<listener>
+		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+	</listener>
+
+
+	<!-- 应用自定义初始化Servlet，初始化一些自己定义的参数 -->
+	<servlet>
+		<servlet-name>appIntiServlet</servlet-name>
+		<servlet-class>com.sevencolor.comm.init.IntiServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- Spring MVC 分发器 (会创建一个“子容器"，子上下文可以访问父上下文中的内容，但父上下文不能访问子上下文中的内容。 -->
+	<!-- 不使用listener监听器来加载spring的配置文件，只使用DispatcherServlet来加载spring的配置，不要父子上下文。 -->
+	<!-- 只使用一个DispatcherServlet，只使用子上下文容器，不要父上下文容器 ，就可以实现了Actio控制事物。) -->
+	<servlet>
+		<description>Spring MVC Servlet</description>
+		<servlet-name>springMVC</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:spring-mvc.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>springMVC</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<!-- 监控页面：http://ip：port/projectName/druid/index.html -->
+	<servlet>
+		<servlet-name>druidStatView</servlet-name>
+		<servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+		<init-param>
+			<param-name>resetEnable</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>loginUsername</param-name>
+			<param-value>yinhong</param-value>
+		</init-param>
+		<init-param>
+			<param-name>loginPassword</param-name>
+			<param-value>123456</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>druidStatView</servlet-name>
+		<url-pattern>/druid/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- Druid监控所有访问 -->
+	<filter>
+		<filter-name>druidWebStatFilter</filter-name>
+		<filter-class>com.alibaba.druid.support.http.WebStatFilter</filter-class>
+		<init-param>
+			<param-name>exclusions</param-name>
+			<param-value>*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>druidWebStatFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- 编码配置 -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- 默认初始页面 -->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- 会话超期时间 -->
+	<session-config>
+		<session-timeout>300</session-timeout>
+	</session-config>
+
+	<!-- 404错误页面 -->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/page/error.jsp</location>
+	</error-page>
+
+	<!-- 500错误页面 -->
+	<error-page>
+		<error-code>500</error-code>
+		<location>/page/error.jsp</location>
+	</error-page>
+
+</web-app>

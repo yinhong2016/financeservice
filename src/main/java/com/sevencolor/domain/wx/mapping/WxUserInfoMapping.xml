@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sevencolor.domain.wx.dao.WxUserInfoMapper">
+	<resultMap id="BaseResultMap" type="WxUserInfo">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="nickname" property="nickname" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="province" property="province" jdbcType="VARCHAR" />
+		<result column="country" property="country" jdbcType="VARCHAR" />
+		<result column="openid" property="openid" jdbcType="VARCHAR" />
+		<result column="headimgurl" property="headimgurl" jdbcType="VARCHAR" />
+		<result column="subscribe" property="subscribe" jdbcType="VARCHAR" />
+		<result column="language" property="language" jdbcType="VARCHAR" />
+		<result column="subscribe_time" property="subscribeTime"
+			jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="groupid" property="groupid" jdbcType="VARCHAR" />
+		<result column="state" property="state" jdbcType="VARCHAR" />
+		<result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+		<result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, nickname, sex, city, province, country, openid,
+		headimgurl,
+		subscribe, language,
+		subscribe_time, remark, groupid, state,
+		createtime, updatetime
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from wx_userinfo
+		where id = #{id,jdbcType=BIGINT}
+	</select>
+	<select id="selectByOpenid" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from wx_userinfo
+		where openid = #{openid,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from
+		wx_userinfo
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+	<insert id="insert" parameterType="WxUserInfo" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into wx_userinfo (nickname, sex,
+		city, province,
+		country,
+		openid, headimgurl, subscribe,
+		language, subscribe_time,
+		remark,
+		groupid, state, createtime,
+		updatetime)
+		values
+		(#{nickname,jdbcType=VARCHAR},
+		#{sex,jdbcType=VARCHAR},
+		#{city,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR},
+		#{country,jdbcType=VARCHAR},
+		#{openid,jdbcType=VARCHAR},
+		#{headimgurl,jdbcType=VARCHAR},
+		#{subscribe,jdbcType=VARCHAR},
+		#{language,jdbcType=VARCHAR}, #{subscribeTime,jdbcType=VARCHAR},
+		#{remark,jdbcType=VARCHAR},
+		#{groupid,jdbcType=VARCHAR},
+		#{state,jdbcType=VARCHAR},
+		#{createtime,jdbcType=TIMESTAMP},
+		#{updatetime,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="WxUserInfo"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into wx_userinfo
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="nickname != null">
+				nickname,
+			</if>
+			<if test="sex != null">
+				sex,
+			</if>
+			<if test="city != null">
+				city,
+			</if>
+			<if test="province != null">
+				province,
+			</if>
+			<if test="country != null">
+				country,
+			</if>
+			<if test="openid != null">
+				openid,
+			</if>
+			<if test="headimgurl != null">
+				headimgurl,
+			</if>
+			<if test="subscribe != null">
+				subscribe,
+			</if>
+			<if test="language != null">
+				language,
+			</if>
+			<if test="subscribeTime != null">
+				subscribe_time,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="groupid != null">
+				groupid,
+			</if>
+			<if test="state != null">
+				state,
+			</if>
+			<if test="createtime != null">
+				createtime,
+			</if>
+			<if test="updatetime != null">
+				updatetime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="nickname != null">
+				#{nickname,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				#{sex,jdbcType=VARCHAR},
+			</if>
+			<if test="city != null">
+				#{city,jdbcType=VARCHAR},
+			</if>
+			<if test="province != null">
+				#{province,jdbcType=VARCHAR},
+			</if>
+			<if test="country != null">
+				#{country,jdbcType=VARCHAR},
+			</if>
+			<if test="openid != null">
+				#{openid,jdbcType=VARCHAR},
+			</if>
+			<if test="headimgurl != null">
+				#{headimgurl,jdbcType=VARCHAR},
+			</if>
+			<if test="subscribe != null">
+				#{subscribe,jdbcType=VARCHAR},
+			</if>
+			<if test="language != null">
+				#{language,jdbcType=VARCHAR},
+			</if>
+			<if test="subscribeTime != null">
+				#{subscribeTime,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="groupid != null">
+				#{groupid,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null">
+				#{state,jdbcType=VARCHAR},
+			</if>
+			<if test="createtime != null">
+				#{createtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatetime != null">
+				#{updatetime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="WxUserInfo">
+		update wx_userinfo
+		<set>
+			<if test="nickname != null">
+				nickname = #{nickname,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				sex = #{sex,jdbcType=VARCHAR},
+			</if>
+			<if test="city != null">
+				city = #{city,jdbcType=VARCHAR},
+			</if>
+			<if test="province != null">
+				province = #{province,jdbcType=VARCHAR},
+			</if>
+			<if test="country != null">
+				country = #{country,jdbcType=VARCHAR},
+			</if>
+			<if test="openid != null">
+				openid = #{openid,jdbcType=VARCHAR},
+			</if>
+			<if test="headimgurl != null">
+				headimgurl = #{headimgurl,jdbcType=VARCHAR},
+			</if>
+			<if test="subscribe != null">
+				subscribe = #{subscribe,jdbcType=VARCHAR},
+			</if>
+			<if test="language != null">
+				language = #{language,jdbcType=VARCHAR},
+			</if>
+			<if test="subscribeTime != null">
+				subscribe_time = #{subscribeTime,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="groupid != null">
+				groupid = #{groupid,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null">
+				state = #{state,jdbcType=VARCHAR},
+			</if>
+			<if test="createtime != null">
+				createtime = #{createtime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updatetime != null">
+				updatetime = #{updatetime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="WxUserInfo">
+		update wx_userinfo
+		set nickname = #{nickname,jdbcType=VARCHAR},
+		sex =
+		#{sex,jdbcType=VARCHAR},
+		city = #{city,jdbcType=VARCHAR},
+		province =
+		#{province,jdbcType=VARCHAR},
+		country = #{country,jdbcType=VARCHAR},
+		openid = #{openid,jdbcType=VARCHAR},
+		headimgurl =
+		#{headimgurl,jdbcType=VARCHAR},
+		subscribe =
+		#{subscribe,jdbcType=VARCHAR},
+		language = #{language,jdbcType=VARCHAR},
+		subscribe_time = #{subscribeTime,jdbcType=VARCHAR},
+		remark =
+		#{remark,jdbcType=VARCHAR},
+		groupid = #{groupid,jdbcType=VARCHAR},
+		state = #{state,jdbcType=VARCHAR},
+		createtime =
+		#{createtime,jdbcType=TIMESTAMP},
+		updatetime =
+		#{updatetime,jdbcType=TIMESTAMP}
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+</mapper>

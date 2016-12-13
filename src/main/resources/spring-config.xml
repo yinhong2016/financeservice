@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd 
+http://www.springframework.org/schema/tx 
+http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<!-- 开启注解后，将自动扫描、自动注入 -->
+	<context:component-scan base-package="com.sevencolor.service" />
+	<context:component-scan base-package="com.sevencolor.domain" />
+
+	<!-- 支持各种注解，使得注解可以正常工作 -->
+	<context:annotation-config />
+
+	<!-- 国际化信息资源工具类 ,静态变量不能autowired -->
+	<bean id="messageSourceHelper" class="com.sevencolor.comm.util.MessageUtil">
+		<property name="messageSource" ref="messageSource" />
+	</bean>
+
+	<!-- 绑定国际化信息资源 -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<!-- 国际化信息所在的文件名 -->
+		<property name="basename" value="messages" />
+		<!-- 如果在国际化资源文件中找不到对应代码的信息，就用代码作为名称 -->
+		<property name="useCodeAsDefaultMessage" value="true" />
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+
+	<!--配置数据源 -->
+	<bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/captured_msg" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="5" />
+		<!-- 连接池最大使用连接数量 -->
+		<property name="maxActive" value="100" />
+		<!-- 连接池最大空闲 -->
+		<property name="maxIdle" value="10" />
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="0" />
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="60000" />
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxPoolPreparedStatementPerConnectionSize"
+			value="33" />
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="25200000" />
+		<!-- 打开 removeAbandoned 功能 -->
+		<property name="removeAbandoned" value="true" />
+		<!-- 1800 秒，也就是 30 分钟 -->
+		<property name="removeAbandonedTimeout" value="1800" />
+		<!-- 关闭 abanded 连接时输出错误日志 -->
+		<property name="logAbandoned" value="true" />
+		<!-- 监控数据库 -->
+		<property name="filters" value="mergeStat" />
+	</bean>
+
+	<!-- 配置SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+	</bean>
+
+	<!-- 查找类路径下的映射器并自动创建成MapperFactoryBean,它将创建的代理类实现口,并且注入Spring -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.sevencolor.domain" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
+	<!-- 配置注解事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 注解方式配置事物 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- 配置 druid 监控 spring jdbc -->
+	<bean id="druid-stat-interceptor"
+		class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+	</bean>
+	<bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+		scope="prototype">
+		<property name="patterns">
+			<list>
+				<value>com.sevencolor.*</value>
+			</list>
+		</property>
+	</bean>
+	<aop:config>
+		<aop:advisor advice-ref="druid-stat-interceptor"
+			pointcut-ref="druid-stat-pointcut" />
+	</aop:config>
+
+	<!-- 定时运行的任务 -->
+	<bean id="wxQuartzJob" class="com.sevencolor.service.wx.WxQuartzJob"></bean>
+
+	<!-- 定时获取Access_Token -->
+	<bean id="jobtaskForToken"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="wxQuartzJob" />
+		</property>
+		<!-- 定时获取微信Access_Token -->
+		<property name="targetMethod">
+			<value>getAccessToken_JsApiTicket</value>
+		</property>
+
+	</bean>
+
+	<!-- 定义获取Access_Token的定时触发时间 -->
+	<bean id="doTimeForToken"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="jobtaskForToken" />
+		</property>
+		<property name="repeatInterval">
+			<value>6600000</value>
+		</property>
+		<property name="startDelay">
+			<value>2000</value>
+		</property>
+	</bean>
+
+	<!-- 任务总管理类 -->
+	<bean id="startQuertz" lazy-init="false" autowire="no"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="doTimeForToken" />
+			</list>
+		</property>
+	</bean>
+
+</beans>
