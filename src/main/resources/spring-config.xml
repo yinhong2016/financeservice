@@ -39,7 +39,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 		init-method="init" destroy-method="close">
 		<property name="url" value="jdbc:mysql://127.0.0.1:3306/financespider" />
 		<property name="username" value="root" />
-		<property name="password" value="root" />
+		<property name="password" value="Terry2008" />
 		<!-- 初始化连接大小 -->
 		<property name="initialSize" value="5" />
 		<!-- 连接池最大使用连接数量 -->
