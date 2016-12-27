@@ -140,7 +140,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 			<ref bean="jobtaskForCubeHistogram" />
 		</property>
 		<property name="repeatInterval">
-			<value>3600000</value>
+			<value>1800000</value>
 		</property>
 		<property name="startDelay">
 			<value>10000</value>
@@ -154,7 +154,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 			<ref bean="jobtaskForToken" />
 		</property>
 		<property name="repeatInterval">
-			<value>6600000</value>
+			<value>5400000</value>
 		</property>
 		<property name="startDelay">
 			<value>5000</value>

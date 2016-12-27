@@ -55,8 +55,6 @@ public class CubeRebHistogramTask {
 		// 得到前一天的时间
 		Date dBefore = calendar.getTime();
 
-		System.out.println(dBefore.getTime());
-
 		// 查询前一天组合涉及所有股票的集合
 		List<RebalanceStatisticsInfo> resultList = rebalanceStatisticsInfo.selectByCreateTime(dBefore.getTime());
 
