@@ -55,6 +55,8 @@ public class CubeRebHistogramTask {
 		// 得到前一天的时间
 		Date dBefore = calendar.getTime();
 
+		System.out.println(dBefore.getTime());
+
 		// 查询前一天组合涉及所有股票的集合
 		List<RebalanceStatisticsInfo> resultList = rebalanceStatisticsInfo.selectByCreateTime(dBefore.getTime());
 
@@ -67,9 +69,9 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (RebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), "");
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStocksymbol(), "");
 				}
-				setCnConfig();
+				// setCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart(MessageUtil.getMessage("message.comm.stockinfo"),
 						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
 						dataset, PlotOrientation.VERTICAL, true, false, false);
@@ -124,9 +126,9 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (RebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), "");
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStocksymbol(), "");
 				}
-				setCnConfig();
+				// setCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart(MessageUtil.getMessage("message.comm.stockinfo"),
 						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
 						dataset, PlotOrientation.VERTICAL, true, false, false);
@@ -181,9 +183,9 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (RebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), "");
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStocksymbol(), "");
 				}
-				setCnConfig();
+				// setCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart(MessageUtil.getMessage("message.comm.stockinfo"),
 						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
 						dataset, PlotOrientation.VERTICAL, true, false, false);
