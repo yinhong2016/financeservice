@@ -19,8 +19,12 @@
 	</settings>
 	<typeAliases>
 		<typeAlias alias="WxUserInfo" type="com.sevencolor.domain.wx.pojo.WxUserInfo" />
+		<typeAlias alias="RebalanceStatisticsInfo"
+			type="com.sevencolor.domain.pojo.RebalanceStatisticsInfo" />
 	</typeAliases>
 	<mappers>
 		<mapper resource="com/sevencolor/domain/wx/mapping/WxUserInfoMapping.xml" />
+		<mapper
+			resource="com/sevencolor/domain/mapping/RebalanceStatisticsInfoMapper.xml" />
 	</mappers>
 </configuration>

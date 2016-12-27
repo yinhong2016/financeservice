@@ -6,7 +6,7 @@
  * @date: 2016年11月29日 下午3:34:19
  * @version: V1.0
  */
-package com.sevencolor.comm.wx.util;
+package com.sevencolor.service.wx;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

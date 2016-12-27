@@ -11,8 +11,6 @@ package com.sevencolor.service.wx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sevencolor.comm.wx.util.WxTask;
-
 /**
  * @Description: 用于定时执行某些任务
  */

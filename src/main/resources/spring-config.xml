@@ -14,8 +14,7 @@ http://www.springframework.org/schema/aop
 http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
 	<!-- 开启注解后，将自动扫描、自动注入 -->
-	<context:component-scan base-package="com.sevencolor.service" />
-	<context:component-scan base-package="com.sevencolor.domain" />
+	<context:component-scan base-package="com.sevencolor" />
 
 	<!-- 支持各种注解，使得注解可以正常工作 -->
 	<context:annotation-config />
@@ -38,7 +37,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 	<!--配置数据源 -->
 	<bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
 		init-method="init" destroy-method="close">
-		<property name="url" value="jdbc:mysql://127.0.0.1:3306/captured_msg" />
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/financespider" />
 		<property name="username" value="root" />
 		<property name="password" value="root" />
 		<!-- 初始化连接大小 -->
@@ -108,6 +107,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
 	<!-- 定时运行的任务 -->
 	<bean id="wxQuartzJob" class="com.sevencolor.service.wx.WxQuartzJob"></bean>
+	<bean id="cubeRebHistogramJob" class="com.sevencolor.service.comm.CubeRebHistogramJob"></bean>
 
 	<!-- 定时获取Access_Token -->
 	<bean id="jobtaskForToken"
@@ -119,7 +119,32 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 		<property name="targetMethod">
 			<value>getAccessToken_JsApiTicket</value>
 		</property>
+	</bean>
 
+	<!-- 定时生成图表 -->
+	<bean id="jobtaskForCubeHistogram"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="cubeRebHistogramJob" />
+		</property>
+		<!-- 生成柱状图 -->
+		<property name="targetMethod">
+			<value>createHistogram</value>
+		</property>
+	</bean>
+
+	<!-- 定义生成组合柱状图表定时触发时间 -->
+	<bean id="doTimeForCubeHistogram"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="jobtaskForCubeHistogram" />
+		</property>
+		<property name="repeatInterval">
+			<value>3600000</value>
+		</property>
+		<property name="startDelay">
+			<value>10000</value>
+		</property>
 	</bean>
 
 	<!-- 定义获取Access_Token的定时触发时间 -->
@@ -132,7 +157,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 			<value>6600000</value>
 		</property>
 		<property name="startDelay">
-			<value>2000</value>
+			<value>5000</value>
 		</property>
 	</bean>
 
@@ -142,6 +167,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 		<property name="triggers">
 			<list>
 				<ref bean="doTimeForToken" />
+				<ref bean="doTimeForCubeHistogram" />
 			</list>
 		</property>
 	</bean>

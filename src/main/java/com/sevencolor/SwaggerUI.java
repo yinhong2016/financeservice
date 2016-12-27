@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import com.sevencolor.comm.util.MessageUtil;
@@ -58,6 +59,15 @@ public class SwaggerUI extends WebMvcConfigurationSupport {
     }
 
     return docket;
+  }
+
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("swagger-ui.html")
+        .addResourceLocations("classpath:/META-INF/resources/");
+
+    registry.addResourceHandler("/webjars/**")
+        .addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 
 }

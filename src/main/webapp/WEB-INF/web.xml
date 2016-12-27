@@ -6,6 +6,11 @@
 	id="WebApp_ID" version="3.0">
 	<display-name>financeservice</display-name>
 
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>financeservice.root</param-value>
+	</context-param>
+
 	<!-- Spring 配置信息加载 (Spring 会创建一个“父容器") -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
