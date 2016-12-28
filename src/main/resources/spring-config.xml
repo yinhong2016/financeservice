@@ -37,7 +37,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 	<!--配置数据源 -->
 	<bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
 		init-method="init" destroy-method="close">
-		<property name="url" value="jdbc:mysql://118.89.42.89:3306/financespider" />
+		<property name="url" value="jdbc:mysql://7colorworld.com:3306/financespider" />
 		<property name="username" value="root" />
 		<property name="password" value="Terry2008" />
 		<!-- 初始化连接大小 -->
@@ -166,7 +166,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<ref bean="doTimeForToken" />
+				<!-- <ref bean="doTimeForToken" />  -->
 				<ref bean="doTimeForCubeHistogram" />
 			</list>
 		</property>

@@ -55,114 +55,111 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/wxentrance")
 public class WxEntranceController {
 
-  private static final Logger logger = LoggerFactory.getLogger(WxEntranceController.class);
+	private static final Logger logger = LoggerFactory.getLogger(WxEntranceController.class);
 
-  @Autowired
-  private WxUserServiceI wxUserService;
+	@Autowired
+	private WxUserServiceI wxUserService;
 
-  @ApiOperation(value = "微信服务器验证")
-  @SuppressWarnings("deprecation")
-  @RequestMapping(value = "getin", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE)
-  public void wxServerVerify(HttpServletRequest request, HttpServletResponse response,
-      @RequestParam(value = "signature", required = true) String signature,
-      @RequestParam(value = "timestamp", required = true) String timestamp,
-      @RequestParam(value = "nonce", required = true) String nonce,
-      @RequestParam(value = "echostr", required = true) String echostr)
-      throws UnsupportedEncodingException {
+	@ApiOperation(value = "微信服务器验证")
+	@SuppressWarnings("deprecation")
+	@RequestMapping(value = "getin", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE)
+	public void wxServerVerify(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(value = "signature", required = true) String signature,
+			@RequestParam(value = "timestamp", required = true) String timestamp,
+			@RequestParam(value = "nonce", required = true) String nonce,
+			@RequestParam(value = "echostr", required = true) String echostr) throws UnsupportedEncodingException {
 
-    PrintWriter out = null;
-    String result = "";
-    try {
-      out = response.getWriter();
-      String[] str = {PropertiesUtil.getProperty("webchat.token"), timestamp, nonce};
-      Arrays.sort(str);
-      String bigStr = str[0] + str[1] + str[2];
-      String digest = DigestUtils.shaHex(bigStr.getBytes());
+		PrintWriter out = null;
+		String result = "";
+		try {
+			out = response.getWriter();
+			String[] str = { PropertiesUtil.getProperty("webchat.token"), timestamp, nonce };
+			Arrays.sort(str);
+			String bigStr = str[0] + str[1] + str[2];
+			String digest = DigestUtils.shaHex(bigStr.getBytes());
 
-      // 确认请求来至微信服务器验证并验证成功
-      if (digest.equals(signature)) {
-        result = echostr;
-      }
+			// 确认请求来至微信服务器验证并验证成功
+			if (digest.equals(signature)) {
+				result = echostr;
+			}
 
-      out.print(result);
-    } catch (IOException e) {
-      logger.error("verify server failed.", e);
-    } finally {
-      if (out != null) {
-        out.close();
-      }
-    }
+			out.print(result);
+		} catch (IOException e) {
+			logger.error("verify server failed.", e);
+		} finally {
+			if (out != null) {
+				out.close();
+			}
+		}
 
-  }
+	}
 
-  @SuppressWarnings("deprecation")
-  @ApiOperation(value = "执行微信公众号事件以及消息处理")
-  @RequestMapping(value = "getin", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
-  public void wxProcedure(HttpServletRequest request, HttpServletResponse response)
-      throws UnsupportedEncodingException {
+	@SuppressWarnings("deprecation")
+	@ApiOperation(value = "执行微信公众号事件以及消息处理")
+	@RequestMapping(value = "getin", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
+	public void wxProcedure(HttpServletRequest request, HttpServletResponse response)
+			throws UnsupportedEncodingException {
 
-    request.setCharacterEncoding(HTTP.UTF_8);
-    response.setCharacterEncoding(HTTP.UTF_8);
+		request.setCharacterEncoding(HTTP.UTF_8);
+		response.setCharacterEncoding(HTTP.UTF_8);
 
-    PrintWriter out = null;
-    String result = "";
-    try {
-      out = response.getWriter();
+		PrintWriter out = null;
+		String result = "";
+		try {
+			out = response.getWriter();
 
-      // 解析微信请求的XML数据
-      Map<String, String> map = WxMsgUtil.parseXml(request);
-      String msgtype = map.get("MsgType");
-      // 根据MsgType类型判断处理方式, 进入事件或消息处理
-      if (WxMsgType.REQ_MESSAGE_TYPE_EVENT.equals(msgtype)) {
-        result = WxEventDispatcher.processEvent(map);
-      } else {
-        result = WxMsgDispatcher.processMessage(map);
-      }
-      out.print(result);
-    } catch (IOException | DocumentException | URISyntaxException e) {
-      logger.error("handle webchat message or event failed.", e);
-    } finally {
-      if (out != null) {
-        out.close();
-      }
-    }
+			// 解析微信请求的XML数据
+			Map<String, String> map = WxMsgUtil.parseXml(request);
+			String msgtype = map.get("MsgType");
+			// 根据MsgType类型判断处理方式, 进入事件或消息处理
+			if (WxMsgType.REQ_MESSAGE_TYPE_EVENT.equals(msgtype)) {
+				result = WxEventDispatcher.processEvent(map);
+			} else {
+				result = WxMsgDispatcher.processMessage(map);
+			}
+			out.print(result);
+		} catch (IOException | DocumentException | URISyntaxException e) {
+			logger.error("handle webchat message or event failed.", e);
+		} finally {
+			if (out != null) {
+				out.close();
+			}
+		}
 
-  }
+	}
 
-  @SuppressWarnings("deprecation")
-  @ApiOperation(value = "页面鉴权以及获取用户openid,通过openid从数据库获取用户基本及信息")
-  @RequestMapping(value = "oauth", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE)
-  public void oAuth2(HttpServletRequest request, HttpServletResponse response,
-      @RequestParam(value = "code", required = true) String code)
-      throws ServletException, IOException {
+	@SuppressWarnings("deprecation")
+	@ApiOperation(value = "页面鉴权以及获取用户openid,通过openid从数据库获取用户基本及信息")
+	@RequestMapping(value = "oauth", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE)
+	public void oAuth2(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(value = "code", required = true) String code) throws ServletException, IOException {
 
-    request.setCharacterEncoding(HTTP.UTF_8);
-    response.setCharacterEncoding(HTTP.UTF_8);
+		request.setCharacterEncoding(HTTP.UTF_8);
+		response.setCharacterEncoding(HTTP.UTF_8);
 
-    String appId = PropertiesUtil.getProperty("webchat.appid");
-    String appSecret = PropertiesUtil.getProperty("webchat.appsecret");
-    String paramsUrl = "";
+		String appId = PropertiesUtil.getProperty("webchat.appid");
+		String appSecret = PropertiesUtil.getProperty("webchat.appsecret");
+		String paramsUrl = "";
 
-    if (!"authdeny".equals(code)) {
-      try {
-        // 获取网页授权access_token
-        WxOAuthToken wxOAuth2Token = WxCommUtil.getOauth2Token(appId, appSecret, code);
-        // 用户标识
-        String openId = wxOAuth2Token.getOpenId();
-        // 根据用户OpenID，从数据库获取用户信息
-        WxUserInfo wxUserInfo = wxUserService.getUserByOpenId(openId);
+		if (!"authdeny".equals(code)) {
+			try {
+				// 获取网页授权access_token
+				WxOAuthToken wxOAuth2Token = WxCommUtil.getOauth2Token(appId, appSecret, code);
+				// 用户标识
+				String openId = wxOAuth2Token.getOpenId();
+				// 根据用户OpenID，从数据库获取用户信息
+				WxUserInfo wxUserInfo = wxUserService.getUserByOpenId(openId);
 
-        paramsUrl = "?openid=" + wxUserInfo.getOpenid() + "&nickname=" + wxUserInfo.getNickname();
-        response.sendRedirect(PropertiesUtil.getProperty("ui.index.url") + paramsUrl);
-        return;
+				paramsUrl = "?openid=" + wxUserInfo.getOpenid() + "&nickname=" + wxUserInfo.getNickname();
+				response.sendRedirect(PropertiesUtil.getProperty("ui.index.url") + paramsUrl);
+				return;
 
-      } catch (IOException | KeyManagementException | NoSuchAlgorithmException
-          | NoSuchProviderException e) {
-        logger.error("web oauth failed.", e);
-      }
-    }
+			} catch (IOException | KeyManagementException | NoSuchAlgorithmException | NoSuchProviderException e) {
+				logger.error("web oauth failed.", e);
+			}
+		}
 
-    response.sendRedirect(PropertiesUtil.getProperty("ui.error.url"));
-  }
+		response.sendRedirect(PropertiesUtil.getProperty("ui.error.url"));
+	}
 
 }

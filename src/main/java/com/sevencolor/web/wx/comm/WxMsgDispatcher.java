@@ -26,80 +26,80 @@ import com.sevencolor.web.wx.msg.response.WxRespTextMsg;
  */
 public class WxMsgDispatcher {
 
-  private static final Logger logger = LoggerFactory.getLogger(WxMsgDispatcher.class);
+	private static final Logger logger = LoggerFactory.getLogger(WxMsgDispatcher.class);
 
-  public static String processMessage(Map<String, String> map) {
+	public static String processMessage(Map<String, String> map) {
 
-    String openid = map.get("FromUserName");
-    String mpid = map.get("ToUserName");
-    String msgType = map.get("MsgType");
-    String result = "";
+		String openid = map.get("FromUserName");
+		String mpid = map.get("ToUserName");
+		String msgType = map.get("MsgType");
+		String result = "";
 
-    switch (msgType) {
+		switch (msgType) {
 
-      // 文本消息
-      case WxMsgType.REQ_MESSAGE_TYPE_TEXT: {
-        WxRespTextMsg txtmsg = new WxRespTextMsg();
-        txtmsg.setToUserName(openid);
-        txtmsg.setFromUserName(mpid);
-        txtmsg.setCreateTime(new Date().getTime());
-        txtmsg.setMsgType(WxMsgType.RESP_MESSAGE_TYPE_TEXT);
-        txtmsg.setContent("你好，这里是Terry个人账号！");
-        result = WxMsgUtil.textMessageToXml(txtmsg);
-        break;
-      }
+		// 文本消息
+		case WxMsgType.REQ_MESSAGE_TYPE_TEXT: {
+			WxRespTextMsg txtmsg = new WxRespTextMsg();
+			txtmsg.setToUserName(openid);
+			txtmsg.setFromUserName(mpid);
+			txtmsg.setCreateTime(new Date().getTime());
+			txtmsg.setMsgType(WxMsgType.RESP_MESSAGE_TYPE_TEXT);
+			txtmsg.setContent("你好，这里是Terry个人账号！");
+			result = WxMsgUtil.textMessageToXml(txtmsg);
+			break;
+		}
 
-      // 图文消息
-      case WxMsgType.REQ_MESSAGE_TYPE_IMAGE: {
-        WxRespNewsMsg newmsg = new WxRespNewsMsg();
-        newmsg.setToUserName(openid);
-        newmsg.setFromUserName(mpid);
-        newmsg.setCreateTime(new Date().getTime());
-        newmsg.setMsgType(WxMsgType.RESP_MESSAGE_TYPE_NEWS);
+		// 图文消息
+		case WxMsgType.REQ_MESSAGE_TYPE_IMAGE: {
+			WxRespNewsMsg newmsg = new WxRespNewsMsg();
+			newmsg.setToUserName(openid);
+			newmsg.setFromUserName(mpid);
+			newmsg.setCreateTime(new Date().getTime());
+			newmsg.setMsgType(WxMsgType.RESP_MESSAGE_TYPE_NEWS);
 
-        WxArticle article = new WxArticle();
-        article.setDescription("这是图文消息 ");
-        article.setPicUrl(
-            "http://p4.gexing.com/G1/M00/8D/97/rBACFFOmEOyRqIiyAAAhbwMbRv4671_200x200_3.jpg?recache=20131108");
-        article.setTitle("小美女");
-        article.setUrl("http://image.baidu.com");
-        List<WxArticle> list = new ArrayList<WxArticle>();
-        list.add(article);
+			WxArticle article = new WxArticle();
+			article.setDescription("这是图文消息 ");
+			article.setPicUrl(
+					"http://p4.gexing.com/G1/M00/8D/97/rBACFFOmEOyRqIiyAAAhbwMbRv4671_200x200_3.jpg?recache=20131108");
+			article.setTitle("小美女");
+			article.setUrl("http://image.baidu.com");
+			List<WxArticle> list = new ArrayList<WxArticle>();
+			list.add(article);
 
-        newmsg.setArticleCount(list.size());
-        newmsg.setArticles(list);
-        result = WxMsgUtil.newsMessageToXml(newmsg);
-        break;
-      }
+			newmsg.setArticleCount(list.size());
+			newmsg.setArticles(list);
+			result = WxMsgUtil.newsMessageToXml(newmsg);
+			break;
+		}
 
-      // 链接消息
-      case WxMsgType.REQ_MESSAGE_TYPE_LINK: {
-        break;
-      }
+		// 链接消息
+		case WxMsgType.REQ_MESSAGE_TYPE_LINK: {
+			break;
+		}
 
-      // 位置消息
-      case WxMsgType.REQ_MESSAGE_TYPE_LOCATION: {
-        break;
-      }
+		// 位置消息
+		case WxMsgType.REQ_MESSAGE_TYPE_LOCATION: {
+			break;
+		}
 
-      // 视屏消息
-      case WxMsgType.REQ_MESSAGE_TYPE_VIDEO: {
-        break;
-      }
+		// 视屏消息
+		case WxMsgType.REQ_MESSAGE_TYPE_VIDEO: {
+			break;
+		}
 
-      // 语音消息
-      case WxMsgType.REQ_MESSAGE_TYPE_VOICE: {
-        break;
-      }
+		// 语音消息
+		case WxMsgType.REQ_MESSAGE_TYPE_VOICE: {
+			break;
+		}
 
-      // 默认
-      default: {
-        logger.info("no webchat event hanlder.");
-        break;
-      }
+		// 默认
+		default: {
+			logger.info("no webchat event hanlder.");
+			break;
+		}
 
-    }
+		}
 
-    return result;
-  }
+		return result;
+	}
 }
