@@ -27,5 +27,6 @@
 		<mapper resource="com/sevencolor/domain/mapping/XQDailyCubeRebStatMapper.xml" />
 		<mapper resource="com/sevencolor/domain/mapping/XQMonthlyCubeRebStatMapper.xml" />
 		<mapper resource="com/sevencolor/domain/mapping/XQYearlyCubeRebStatMapper.xml" />
+		<mapper resource="com/sevencolor/domain/mapping/XQSummeryCubeRebStatMapper.xml" />
 	</mappers>
 </configuration>

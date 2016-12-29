@@ -31,6 +31,7 @@ public class CubeRebHistogramJob {
 			cubeRebHistogramTask.xqDailyTopNCubeHistogram();
 			cubeRebHistogramTask.xqMonthlyTopNHistogram();
 			cubeRebHistogramTask.xqYearlyTopNHistogram();
+			cubeRebHistogramTask.xqSummeryTopNHistogram();
 		} catch (Exception e) {
 			logger.error("create histogram failed.", e);
 		}

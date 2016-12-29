@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 import com.sevencolor.comm.util.MessageUtil;
 import com.sevencolor.domain.dao.XQDailyCubeRebStatDao;
 import com.sevencolor.domain.dao.XQMonthlyCubeRebStatDao;
+import com.sevencolor.domain.dao.XQSummeryCubeDao;
 import com.sevencolor.domain.dao.XQYearlyCubeRebStatDao;
 import com.sevencolor.domain.pojo.CubeRebalanceStatisticsInfo;
 
@@ -50,6 +51,8 @@ public class CubeRebHistogramTask {
 	private XQMonthlyCubeRebStatDao xqMonthlyCubeRebStatDao;
 	@Autowired
 	private XQYearlyCubeRebStatDao xqYearlyCubeRebStatDao;
+	@Autowired
+	private XQSummeryCubeDao xqSummeryCubeDao;
 
 	/**
 	 * 
@@ -85,6 +88,61 @@ public class CubeRebHistogramTask {
 	}
 
 	/**
+	 * 
+	 * @Description: 年收益与月收益排名靠前组合所共同拥有股票的报表（一周内）
+	 * @return: void
+	 */
+	public void xqSummeryTopNHistogram() {
+		xqSummeryCubeHistogramLastWeek();
+	}
+
+	private void xqSummeryCubeHistogramLastWeek() {
+
+		List<CubeRebalanceStatisticsInfo> resultList = xqSummeryCubeDao.selectSummeryCubeRebalanceStatistics();
+
+		// 生成柱状图片
+		FileOutputStream fos = null;
+		try {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+			if (resultList != null && !resultList.isEmpty()) {
+
+				// 画出柱状图
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+				}
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.week"),
+						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
+						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
+
+				// 判断文件是否存在，不存在则创建一个
+				String resource = this.getClass().getResource("/").getFile();
+				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
+				String histPic = root + "/xqsummerybar.png";
+				if (!new File(histPic).exists()) {
+					new File(histPic).createNewFile();
+				}
+
+				// 真正的柱状图输出
+				fos = new FileOutputStream(histPic);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+			}
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+
+	/**
 	 * @Description: 最近一天柱状报表
 	 * @return: void
 	 */
@@ -109,7 +167,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.day"),
@@ -168,7 +226,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.day"),
@@ -227,7 +285,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.day"),
@@ -286,7 +344,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.week"),
@@ -345,7 +403,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.week"),
@@ -404,7 +462,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.week"),
@@ -463,7 +521,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.month"),
@@ -522,7 +580,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.month"),
@@ -581,7 +639,7 @@ public class CubeRebHistogramTask {
 
 				// 画出柱状图
 				for (CubeRebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
 				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.month"),
