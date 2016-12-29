@@ -20,6 +20,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.slf4j.Logger;
@@ -28,8 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sevencolor.comm.util.MessageUtil;
-import com.sevencolor.domain.dao.RebalanceStatisticsInfoMapper;
-import com.sevencolor.domain.pojo.RebalanceStatisticsInfo;
+import com.sevencolor.domain.dao.XQDailyCubeRebStatDao;
+import com.sevencolor.domain.dao.XQMonthlyCubeRebStatDao;
+import com.sevencolor.domain.dao.XQYearlyCubeRebStatDao;
+import com.sevencolor.domain.pojo.CubeRebalanceStatisticsInfo;
 
 /**
  * @Description: 根据组合中的股票信息，按天、周、月生成柱状报表图片
@@ -40,13 +45,50 @@ public class CubeRebHistogramTask {
 	private static final Logger logger = LoggerFactory.getLogger(CubeRebHistogramTask.class);
 
 	@Autowired
-	private RebalanceStatisticsInfoMapper rebalanceStatisticsInfo;
+	private XQDailyCubeRebStatDao xqDailyCubeRebStatDao;
+	@Autowired
+	private XQMonthlyCubeRebStatDao xqMonthlyCubeRebStatDao;
+	@Autowired
+	private XQYearlyCubeRebStatDao xqYearlyCubeRebStatDao;
+
+	/**
+	 * 
+	 * @Description: 日收益排名靠前的组合报表
+	 * @return: void
+	 */
+	public void xqDailyTopNCubeHistogram() {
+		xqDailyCubeHistogramLastDay();
+		xqDailyCubeHistogramLastWeek();
+		xqDailyCubeHistogramLastMonth();
+	}
+
+	/**
+	 * 
+	 * @Description: 月收益排名靠前的组合报表
+	 * @return: void
+	 */
+	public void xqMonthlyTopNHistogram() {
+		xqMonthlyCubeHistogramLastDay();
+		xqMonthlyCubeHistogramLastWeek();
+		xqMonthlyCubeHistogramLastMonth();
+	}
+
+	/**
+	 * 
+	 * @Description: 年收益排名靠前组合的报表
+	 * @return: void
+	 */
+	public void xqYearlyTopNHistogram() {
+		xqYearlyCubeHistogramLastDay();
+		xqYearlyCubeHistogramLastWeek();
+		xqYearlyCubeHistogramLastMonth();
+	}
 
 	/**
 	 * @Description: 最近一天柱状报表
 	 * @return: void
 	 */
-	public void histogramByDay() {
+	private void xqDailyCubeHistogramLastDay() {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
@@ -56,7 +98,7 @@ public class CubeRebHistogramTask {
 		Date dBefore = calendar.getTime();
 
 		// 查询前一天组合涉及所有股票的集合
-		List<RebalanceStatisticsInfo> resultList = rebalanceStatisticsInfo.selectByCreateTime(dBefore.getTime());
+		List<CubeRebalanceStatisticsInfo> resultList = xqDailyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
 
 		// 生成柱状图片
 		FileOutputStream fos = null;
@@ -66,25 +108,145 @@ public class CubeRebHistogramTask {
 			if (resultList != null && !resultList.isEmpty()) {
 
 				// 画出柱状图
-				for (RebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), "");
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
-				setCnConfig();
-				JFreeChart chart = ChartFactory.createBarChart(MessageUtil.getMessage("message.comm.stockinfo"),
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.day"),
 						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
 						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
 
 				// 判断文件是否存在，不存在则创建一个
 				String resource = this.getClass().getResource("/").getFile();
 				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
-				String histPic = root + "/barday.png";
+				String histPic = root + "/xqdailybarbyday.png";
 				if (!new File(histPic).exists()) {
 					new File(histPic).createNewFile();
 				}
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 400, 300);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+			}
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * @Description: 最近一天柱状报表
+	 * @return: void
+	 */
+	private void xqMonthlyCubeHistogramLastDay() {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		// 设置为前一天
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		// 得到前一天的时间
+		Date dBefore = calendar.getTime();
+
+		// 查询前一天组合涉及所有股票的集合
+		List<CubeRebalanceStatisticsInfo> resultList = xqMonthlyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
+
+		// 生成柱状图片
+		FileOutputStream fos = null;
+		try {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+			if (resultList != null && !resultList.isEmpty()) {
+
+				// 画出柱状图
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+				}
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.day"),
+						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
+						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
+
+				// 判断文件是否存在，不存在则创建一个
+				String resource = this.getClass().getResource("/").getFile();
+				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
+				String histPic = root + "/xqmonthlybarbyday.png";
+				if (!new File(histPic).exists()) {
+					new File(histPic).createNewFile();
+				}
+
+				// 真正的柱状图输出
+				fos = new FileOutputStream(histPic);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+			}
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * @Description: 最近一天柱状报表
+	 * @return: void
+	 */
+	private void xqYearlyCubeHistogramLastDay() {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		// 设置为前一天
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		// 得到前一天的时间
+		Date dBefore = calendar.getTime();
+
+		// 查询前一天组合涉及所有股票的集合
+		List<CubeRebalanceStatisticsInfo> resultList = xqYearlyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
+
+		// 生成柱状图片
+		FileOutputStream fos = null;
+		try {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+			if (resultList != null && !resultList.isEmpty()) {
+
+				// 画出柱状图
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+				}
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.day"),
+						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
+						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
+
+				// 判断文件是否存在，不存在则创建一个
+				String resource = this.getClass().getResource("/").getFile();
+				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
+				String histPic = root + "/xqyearlybarbyday.png";
+				if (!new File(histPic).exists()) {
+					new File(histPic).createNewFile();
+				}
+
+				// 真正的柱状图输出
+				fos = new FileOutputStream(histPic);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -103,7 +265,7 @@ public class CubeRebHistogramTask {
 	 * @Description: 最近一周柱状报表
 	 * @return: void
 	 */
-	public void histogramByWeek() {
+	private void xqMonthlyCubeHistogramLastWeek() {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
@@ -113,7 +275,7 @@ public class CubeRebHistogramTask {
 		Date dBefore = calendar.getTime();
 
 		// 查询前一周组合涉及所有股票的集合
-		List<RebalanceStatisticsInfo> resultList = rebalanceStatisticsInfo.selectByCreateTime(dBefore.getTime());
+		List<CubeRebalanceStatisticsInfo> resultList = xqMonthlyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
 
 		// 生成柱状图片
 		FileOutputStream fos = null;
@@ -123,25 +285,145 @@ public class CubeRebHistogramTask {
 			if (resultList != null && !resultList.isEmpty()) {
 
 				// 画出柱状图
-				for (RebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), "");
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
-				setCnConfig();
-				JFreeChart chart = ChartFactory.createBarChart(MessageUtil.getMessage("message.comm.stockinfo"),
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.week"),
 						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
 						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
 
 				// 判断文件是否存在，不存在则创建一个
 				String resource = this.getClass().getResource("/").getFile();
 				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
-				String histPic = root + "/barweek.png";
+				String histPic = root + "/xqmonthlybarbyweek.png";
 				if (!new File(histPic).exists()) {
 					new File(histPic).createNewFile();
 				}
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 400, 300);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+			}
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * @Description: 最近一周柱状报表
+	 * @return: void
+	 */
+	private void xqDailyCubeHistogramLastWeek() {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		// 设置为前一周
+		calendar.add(Calendar.DAY_OF_MONTH, -7);
+		// 得到前一周某一天的时间
+		Date dBefore = calendar.getTime();
+
+		// 查询前一周组合涉及所有股票的集合
+		List<CubeRebalanceStatisticsInfo> resultList = xqDailyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
+
+		// 生成柱状图片
+		FileOutputStream fos = null;
+		try {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+			if (resultList != null && !resultList.isEmpty()) {
+
+				// 画出柱状图
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+				}
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.week"),
+						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
+						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
+
+				// 判断文件是否存在，不存在则创建一个
+				String resource = this.getClass().getResource("/").getFile();
+				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
+				String histPic = root + "/xqdailybarbyweek.png";
+				if (!new File(histPic).exists()) {
+					new File(histPic).createNewFile();
+				}
+
+				// 真正的柱状图输出
+				fos = new FileOutputStream(histPic);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+			}
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * @Description: 最近一周柱状报表
+	 * @return: void
+	 */
+	private void xqYearlyCubeHistogramLastWeek() {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		// 设置为前一周
+		calendar.add(Calendar.DAY_OF_MONTH, -7);
+		// 得到前一周某一天的时间
+		Date dBefore = calendar.getTime();
+
+		// 查询前一周组合涉及所有股票的集合
+		List<CubeRebalanceStatisticsInfo> resultList = xqYearlyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
+
+		// 生成柱状图片
+		FileOutputStream fos = null;
+		try {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+			if (resultList != null && !resultList.isEmpty()) {
+
+				// 画出柱状图
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+				}
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.week"),
+						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
+						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
+
+				// 判断文件是否存在，不存在则创建一个
+				String resource = this.getClass().getResource("/").getFile();
+				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
+				String histPic = root + "/xqyearlybarbyweek.png";
+				if (!new File(histPic).exists()) {
+					new File(histPic).createNewFile();
+				}
+
+				// 真正的柱状图输出
+				fos = new FileOutputStream(histPic);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -160,7 +442,7 @@ public class CubeRebHistogramTask {
 	 * @Description: 最近一个月柱状报表
 	 * @return: void
 	 */
-	public void histogramByMonth() {
+	private void xqDailyCubeHistogramLastMonth() {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
@@ -170,7 +452,7 @@ public class CubeRebHistogramTask {
 		Date dBefore = calendar.getTime();
 
 		// 查询前一月组合涉及所有股票的集合
-		List<RebalanceStatisticsInfo> resultList = rebalanceStatisticsInfo.selectByCreateTime(dBefore.getTime());
+		List<CubeRebalanceStatisticsInfo> resultList = xqDailyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
 
 		// 生成柱状图片
 		FileOutputStream fos = null;
@@ -180,25 +462,27 @@ public class CubeRebHistogramTask {
 			if (resultList != null && !resultList.isEmpty()) {
 
 				// 画出柱状图
-				for (RebalanceStatisticsInfo r : resultList) {
-					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), "");
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
-				setCnConfig();
-				JFreeChart chart = ChartFactory.createBarChart(MessageUtil.getMessage("message.comm.stockinfo"),
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.month"),
 						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
 						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
 
 				// 判断文件是否存在，不存在则创建一个
 				String resource = this.getClass().getResource("/").getFile();
 				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
-				String histPic = root + "/barmonth.png";
+				String histPic = root + "/xqdailybarbymonth.png";
 				if (!new File(histPic).exists()) {
 					new File(histPic).createNewFile();
 				}
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 400, 300);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -213,7 +497,135 @@ public class CubeRebHistogramTask {
 
 	}
 
-	private void setCnConfig() {
+	/**
+	 * @Description: 最近一个月柱状报表
+	 * @return: void
+	 */
+	private void xqMonthlyCubeHistogramLastMonth() {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		// 设置为前一个月
+		calendar.add(Calendar.MONTH, -1);
+		// 得到前一个月某一天的时间
+		Date dBefore = calendar.getTime();
+
+		// 查询前一月组合涉及所有股票的集合
+		List<CubeRebalanceStatisticsInfo> resultList = xqMonthlyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
+
+		// 生成柱状图片
+		FileOutputStream fos = null;
+		try {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+			if (resultList != null && !resultList.isEmpty()) {
+
+				// 画出柱状图
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+				}
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.month"),
+						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
+						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
+
+				// 判断文件是否存在，不存在则创建一个
+				String resource = this.getClass().getResource("/").getFile();
+				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
+				String histPic = root + "/xqmonthlybarbymonth.png";
+				if (!new File(histPic).exists()) {
+					new File(histPic).createNewFile();
+				}
+
+				// 真正的柱状图输出
+				fos = new FileOutputStream(histPic);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+			}
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * @Description: 最近一个月柱状报表
+	 * @return: void
+	 */
+	private void xqYearlyCubeHistogramLastMonth() {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		// 设置为前一个月
+		calendar.add(Calendar.MONTH, -1);
+		// 得到前一个月某一天的时间
+		Date dBefore = calendar.getTime();
+
+		// 查询前一月组合涉及所有股票的集合
+		List<CubeRebalanceStatisticsInfo> resultList = xqYearlyCubeRebStatDao.selectByCreateTime(dBefore.getTime());
+
+		// 生成柱状图片
+		FileOutputStream fos = null;
+		try {
+			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+			if (resultList != null && !resultList.isEmpty()) {
+
+				// 画出柱状图
+				for (CubeRebalanceStatisticsInfo r : resultList) {
+					dataset.addValue(Integer.parseInt(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
+				}
+				setZhCnConfig();
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.month"),
+						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
+						dataset, PlotOrientation.VERTICAL, true, false, false);
+				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
+				setAxisParam(categoryplot);
+
+				// 判断文件是否存在，不存在则创建一个
+				String resource = this.getClass().getResource("/").getFile();
+				String root = new File(resource).getParentFile().getParentFile().getCanonicalPath();
+				String histPic = root + "/xqyearlybarbymonth.png";
+				if (!new File(histPic).exists()) {
+					new File(histPic).createNewFile();
+				}
+
+				// 真正的柱状图输出
+				fos = new FileOutputStream(histPic);
+				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+			}
+		} catch (IOException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+	}
+
+	private void setAxisParam(CategoryPlot categoryplot) {
+		CategoryAxis domainAxis = categoryplot.getDomainAxis();
+		// X轴上的Lable让其45度倾斜
+		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+		// 设置距离图片左端距离
+		domainAxis.setLowerMargin(0.0);
+		// 设置距离图片右端距离
+		domainAxis.setUpperMargin(0.0);
+	}
+
+	private void setZhCnConfig() {
 		// 创建主题样式
 		StandardChartTheme standardChartTheme = new StandardChartTheme("CN");
 		// 设置标题字体

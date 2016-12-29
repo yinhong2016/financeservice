@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sevencolor.domain.dao.XQYearlyCubeRebStatDao">
+	<resultMap id="BaseResultMap"
+		type="com.sevencolor.domain.pojo.CubeRebalanceStatisticsInfo">
+		<id column="dbID" property="dbid" jdbcType="BIGINT" />
+		<result column="stockSymbol" property="stocksymbol" jdbcType="VARCHAR" />
+		<result column="stockName" property="stockname" jdbcType="VARCHAR" />
+		<result column="totalWeight" property="totalweight" jdbcType="VARCHAR" />
+		<result column="createTime" property="createtime" jdbcType="BIGINT" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		dbID, stockSymbol, stockName, totalWeight, createTime
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from xq_yearly_cube_rebalance_statistics
+		where dbID =
+		#{dbid,jdbcType=BIGINT}
+	</select>
+	<select id="selectByCreateTime" resultMap="BaseResultMap"
+		parameterType="java.lang.Long">
+		select stockSymbol, stockName, sum(totalWeight) as totalWeight from
+		(select
+		<include refid="Base_Column_List" />
+		from xq_yearly_cube_rebalance_statistics
+		where createTime >=
+		#{createtime,jdbcType=BIGINT}) as temp group by stockSymbol
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from
+		xq_yearly_cube_rebalance_statistics
+		where dbID =
+		#{dbid,jdbcType=BIGINT}
+	</delete>
+	<delete id="deleteByCreateTime" parameterType="java.lang.Long">
+		delete from
+		xq_yearly_cube_rebalance_statistics
+		where createTime >=
+		#{createtime,jdbcType=BIGINT}
+	</delete>
+	<insert id="insert"
+		parameterType="com.sevencolor.domain.pojo.CubeRebalanceStatisticsInfo"
+		useGeneratedKeys="true" keyProperty="dbid">
+		insert into
+		xq_yearly_cube_rebalance_statistics
+		(stockSymbol, stockName,
+		totalWeight, createTime)
+		values
+		(#{stocksymbol,jdbcType=VARCHAR},
+		#{stockname,jdbcType=VARCHAR},
+		#{totalweight,jdbcType=VARCHAR},
+		#{createtime,jdbcType=BIGINT})
+	</insert>
+	<insert id="insertSelective"
+		parameterType="com.sevencolor.domain.pojo.CubeRebalanceStatisticsInfo"
+		useGeneratedKeys="true" keyProperty="dbid">
+		insert into xq_yearly_cube_rebalance_statistics
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="stocksymbol != null">
+				stockSymbol,
+			</if>
+			<if test="stockname != null">
+				stockName,
+			</if>
+			<if test="totalweight != null">
+				totalWeight,
+			</if>
+			<if test="createtime != null">
+				createTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="stocksymbol != null">
+				#{stocksymbol,jdbcType=VARCHAR},
+			</if>
+			<if test="stockname != null">
+				#{stockname,jdbcType=VARCHAR},
+			</if>
+			<if test="totalweight != null">
+				#{totalweight,jdbcType=VARCHAR},
+			</if>
+			<if test="createtime != null">
+				#{createtime,jdbcType=BIGINT},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective"
+		parameterType="com.sevencolor.domain.pojo.CubeRebalanceStatisticsInfo">
+		update xq_yearly_cube_rebalance_statistics
+		<set>
+			<if test="stocksymbol != null">
+				stockSymbol = #{stocksymbol,jdbcType=VARCHAR},
+			</if>
+			<if test="stockname != null">
+				stockName = #{stockname,jdbcType=VARCHAR},
+			</if>
+			<if test="totalweight != null">
+				totalWeight = #{totalweight,jdbcType=VARCHAR},
+			</if>
+			<if test="createtime != null">
+				createTime = #{createtime,jdbcType=BIGINT},
+			</if>
+		</set>
+		where dbID = #{dbid,jdbcType=BIGINT}
+	</update>
+	<update id="updateByPrimaryKey"
+		parameterType="com.sevencolor.domain.pojo.CubeRebalanceStatisticsInfo">
+		update
+		xq_yearly_cube_rebalance_statistics
+		set stockSymbol
+		=
+		#{stocksymbol,jdbcType=VARCHAR},
+		stockName =
+		#{stockname,jdbcType=VARCHAR},
+		totalWeight =
+		#{totalweight,jdbcType=VARCHAR},
+		createTime =
+		#{createtime,jdbcType=BIGINT}
+		where dbID = #{dbid,jdbcType=BIGINT}
+	</update>
+</mapper>

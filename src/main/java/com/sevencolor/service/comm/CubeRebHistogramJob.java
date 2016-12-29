@@ -28,9 +28,9 @@ public class CubeRebHistogramJob {
 	 */
 	public void createHistogram() {
 		try {
-			cubeRebHistogramTask.histogramByDay();
-			cubeRebHistogramTask.histogramByWeek();
-			cubeRebHistogramTask.histogramByMonth();
+			cubeRebHistogramTask.xqDailyTopNCubeHistogram();
+			cubeRebHistogramTask.xqMonthlyTopNHistogram();
+			cubeRebHistogramTask.xqYearlyTopNHistogram();
 		} catch (Exception e) {
 			logger.error("create histogram failed.", e);
 		}

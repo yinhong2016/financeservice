@@ -1,6 +1,6 @@
 package com.sevencolor.domain.pojo;
 
-public class RebalanceStatisticsInfo {
+public class CubeRebalanceStatisticsInfo {
   private Long dbid;
 
   private String stocksymbol;
