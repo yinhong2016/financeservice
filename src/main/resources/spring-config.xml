@@ -141,7 +141,7 @@ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 			<ref bean="jobtaskForCubeHistogram" />
 		</property>
 		<property name="repeatInterval">
-			<value>1800000</value>
+			<value>600000</value>
 		</property>
 		<property name="startDelay">
 			<value>10000</value>
