@@ -128,7 +128,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -186,7 +186,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -245,7 +245,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -304,7 +304,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -363,7 +363,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -422,7 +422,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -481,7 +481,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -540,7 +540,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -599,7 +599,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
@@ -658,7 +658,7 @@ public class CubeRebHistogramTask {
 
 				// 真正的柱状图输出
 				fos = new FileOutputStream(histPic);
-				ChartUtilities.writeChartAsPNG(fos, chart, 600, 600);
+				ChartUtilities.writeChartAsPNG(fos, chart, 800, 600);
 			}
 		} catch (IOException e) {
 			logger.error(e.getLocalizedMessage(), e);
