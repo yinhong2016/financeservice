@@ -89,7 +89,7 @@ public class CubeRebHistogramTask {
 
 	/**
 	 * 
-	 * @Description: 年收益与月收益排名靠前组合所共同拥有股票的报表（一周内）
+	 * @Description: 年收益与月收益排名靠前组合所共同拥有股票的报表（2天内）
 	 * @return: void
 	 */
 	public void xqSummeryTopNHistogram() {
@@ -112,7 +112,7 @@ public class CubeRebHistogramTask {
 					dataset.addValue(Double.parseDouble(r.getTotalweight()), r.getStockname(), r.getStocksymbol());
 				}
 				setZhCnConfig();
-				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.week"),
+				JFreeChart chart = ChartFactory.createBarChart3D(MessageUtil.getMessage("message.comm.stockinfo.2day"),
 						MessageUtil.getMessage("message.comm.stock"), MessageUtil.getMessage("message.comm.weight"),
 						dataset, PlotOrientation.VERTICAL, true, false, false);
 				CategoryPlot categoryplot = (CategoryPlot) chart.getPlot();
