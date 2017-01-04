@@ -80,10 +80,10 @@ public class WxEventDispatcher {
 			webchatEventDispatcher.wxUserService.addUser(wxUserInfo);
 
 			WxArticle article = new WxArticle();
-			article.setDescription("恭喜创建成功图文信息,欢迎进入百度！！!");
+			article.setDescription("欢迎关注七彩世界股票：");
 			article.setPicUrl(wxUserInfo.getHeadimgurl());
-			article.setTitle("尊敬的：" + wxUserInfo.getNickname() + ",你好！");
-			article.setUrl("http://www.baidu.com");
+			// article.setTitle("尊敬的：" + wxUserInfo.getNickname() + ",你好！");
+			// article.setUrl("http://www.baidu.com");
 			List<WxArticle> list = new ArrayList<WxArticle>();
 			list.add(article);
 			newmsg.setArticleCount(list.size());
