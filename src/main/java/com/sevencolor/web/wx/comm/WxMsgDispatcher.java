@@ -52,22 +52,18 @@ public class WxMsgDispatcher {
 			article.setPicUrl("http://www.7colorworld.com/financeservice/pic.jpg");
 
 			if (content.equalsIgnoreCase("d") || content.equalsIgnoreCase("D")) {
-				article.setDescription("日收益排名靠前组合购买股票 ");
 				article.setTitle("日收益排名靠前组合购买股票");
 				article.setUrl("http://www.7colorworld.com/financeservice/topcubedaily.jsp");
 			} else if (content.equalsIgnoreCase("m") || content.equalsIgnoreCase("M")) {
-				article.setDescription("月收益排名靠前组合购买股票 ");
 				article.setTitle("月收益排名靠前组合购买股票");
 				article.setUrl("http://www.7colorworld.com/financeservice/topcubemonthly.jsp");
 			} else if (content.equalsIgnoreCase("y") || content.equalsIgnoreCase("Y")) {
-				article.setDescription("年收益排名靠前组合购买股票 ");
 				article.setTitle("年收益排名靠前组合购买股票");
 				article.setUrl("http://www.7colorworld.com/financeservice/topcubeyearly.jsp");
 			} else if (content.equalsIgnoreCase("dy") || content.equalsIgnoreCase("DY")
 					|| content.equalsIgnoreCase("Dy") || content.equalsIgnoreCase("dY")
 					|| content.equalsIgnoreCase("yd") || content.equalsIgnoreCase("YD")
 					|| content.equalsIgnoreCase("yD") || content.equalsIgnoreCase("Yd")) {
-				article.setDescription("年与月收益排名靠前组合都购买的股票 ");
 				article.setTitle("年与月收益排名靠前组合都购买的股票");
 				article.setUrl("http://www.7colorworld.com/financeservice/topcubesummery.jsp");
 			}
